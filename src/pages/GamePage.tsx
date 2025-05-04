@@ -1,14 +1,21 @@
 
 import { TetrisButton } from "../components/TetrisButton";
 import { TetrisGrid } from "../components/TetrisGrid";
+import { useGameSettings } from "../context/GameContext";
 import { GameLogic } from "../utils/GameLogic";
 
 export function GamePage () {
 
-    const { initializeGame, createBlock } = GameLogic();
+    const { initializeGame, pauseGame, createBlock, moveCurrentBlock } = GameLogic();
 
-    const startGame = () => {
+    const handleStartGame = () => {
+
         initializeGame();
+    }
+
+    const handlePauseGame = () => {
+
+        pauseGame();
     }
 
     const handleCreateBlock = (name: string) => {
@@ -18,7 +25,8 @@ export function GamePage () {
 
     return(
         <>
-            <TetrisButton onClick={startGame}>Start Button</TetrisButton>
+            <TetrisButton onClick={handleStartGame}>Start Button</TetrisButton>
+            <TetrisButton onClick={handlePauseGame}>Stop Button</TetrisButton>
 
             <TetrisButton onClick={() => handleCreateBlock("Hero")}>Create Hero</TetrisButton>
             <TetrisButton onClick={() => handleCreateBlock("RhodeIslandZ")}>Create RhodeIslandZ</TetrisButton>
@@ -27,6 +35,8 @@ export function GamePage () {
             <TetrisButton onClick={() => handleCreateBlock("OrangeRicky")}>Create OrangeRicky</TetrisButton>
             <TetrisButton onClick={() => handleCreateBlock("Teewee")}>Create Teewee</TetrisButton>
             <TetrisButton onClick={() => handleCreateBlock("Smashboy")}>Create Smashboy</TetrisButton>
+
+            <TetrisButton onClick={moveCurrentBlock}>Update Current Block</TetrisButton>
            
             <TetrisGrid></TetrisGrid>
         </>

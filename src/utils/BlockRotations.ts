@@ -112,7 +112,7 @@ export function BlockRotations(){
         return smashboy;
     }
 
-    const displayBlock = (currentGrid: string[][], placement: number[], rotationCycle: number, blockName: string) => {
+    const getBlockSwitchCase = (blockName: string, rotationCycle: number) => {
 
         let block: number[][] = [];
 
@@ -134,6 +134,14 @@ export function BlockRotations(){
             default: console.error("Couldn't fetch block");
         }
 
+
+        return block;
+    }
+
+    const displayBlock = (currentGrid: string[][], placement: number[], rotationCycle: number, blockName: string) => {
+
+        let block = getBlockSwitchCase(blockName, rotationCycle);
+        
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
                 currentGrid[placement[0]+i][placement[1]+block[i][n]] = blockName;
@@ -141,5 +149,16 @@ export function BlockRotations(){
         }    
     }
 
-    return {displayBlock};
+    const removeLastBlockPosition = (currentGrid: string[][], lastPlacement: number[], lastRotationCycle: number, blockName: string) => {
+
+        let block = getBlockSwitchCase(blockName, lastRotationCycle);
+
+        for(let i = 0; i < block.length; i++){
+            for(let n = 0; n < block[i].length; n++){
+                currentGrid[lastPlacement[0]+i][lastPlacement[1]+block[i][n]] = "";
+            }
+        }    
+    }
+
+    return {displayBlock, removeLastBlockPosition};
 }
