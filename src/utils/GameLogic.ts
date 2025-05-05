@@ -8,6 +8,7 @@ export function GameLogic(){
         getGridHeight,
         getGridWidth,
         getGridArray,
+        getSolidBlocks,
         getCurrentPosition,
         getLastPosition,
         getCurrentBlockType,
@@ -16,6 +17,7 @@ export function GameLogic(){
         getIntervalId,
         getGameState,
         setGridArray,
+        setSolidBlocks,
         setCurrentPosition,
         setLastPosition,
         setCurrentBlockType,
@@ -25,9 +27,10 @@ export function GameLogic(){
         setGameState
     } = useGameSettings();
 
-    const { displayBlock, removeLastBlockPosition } = BlockRotations();
+    const { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock } = BlockRotations();
 
     const gridArrayRef = useRef(getGridArray);
+    const solidBlocksRef = useRef(getSolidBlocks);
     const currentPositionRef = useRef(getCurrentPosition);
     const currentBlockTypeRef = useRef(getCurrentBlockType);
     const currentBlockRotationRef = useRef(getCurrentBlockRotation);
@@ -37,6 +40,9 @@ export function GameLogic(){
     useEffect(() => {
         gridArrayRef.current = getGridArray;
     }, [getGridArray]);
+    useEffect(() => {
+        solidBlocksRef.current = getSolidBlocks;
+    }, [getSolidBlocks]);
     useEffect(() => {
         currentPositionRef.current = getCurrentPosition;
     }, [getCurrentPosition]);
@@ -59,97 +65,114 @@ export function GameLogic(){
         let rotationCycle = 0;
         let placement = [0, 3];
 
-        // only for test
-        /*
-        currentGrid[0][3] = "";
-        currentGrid[0][4] = "";
-        currentGrid[0][5] = "";
-        currentGrid[0][6] = "";
-
-        currentGrid[1][3] = "";
-        currentGrid[1][4] = "";
-        currentGrid[1][5] = "";
-        currentGrid[1][6] = "";
-
-        currentGrid[2][3] = "";
-        currentGrid[2][4] = "";
-        currentGrid[2][5] = "";
-        currentGrid[2][6] = "";
-        */
-        //
-
         displayBlock(currentGrid, placement, rotationCycle, blockToCreate);
         setCurrentBlockType(blockToCreate);
-        setGridArray(currentGrid);
         setCurrentPosition(placement);
+        setCurrentBlockRotation(rotationCycle);
+        setGridArray(currentGrid);
     }
 
-    const updateCurrentBlockPosition = () => {
+    const handleBlockPlacement = () => {
 
         let currentGrid = [...gridArrayRef.current];
+        let currentSolidBlock = [...solidBlocksRef.current];
         let currentBlockPosition = currentPositionRef.current;
         let currentBlockRotation = currentBlockRotationRef.current;
         let currentBlockType = currentBlockTypeRef.current;
 
-        removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        currentBlockPosition[0] += 1;
+        solidifyBlock(currentSolidBlock, currentBlockPosition, currentBlockRotation, currentBlockType);
 
-        displayBlock(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        setGridArray(currentGrid);
-        setCurrentPosition(currentBlockPosition);
+
+        // Get Next Block
+
+        createBlock("Teewee");
     }
 
     const moveBlockDown = (placeBlock: boolean) => {
 
         let currentGrid = [...gridArrayRef.current];
+        let currentSolidBlock = [...solidBlocksRef.current];
         let currentBlockPosition = currentPositionRef.current;
+        let newBlockPosition = [...currentBlockPosition];
         let currentBlockRotation = currentBlockRotationRef.current;
         let currentBlockType = currentBlockTypeRef.current;
 
-        // if placeBlock === true -> go down until you hit another block
+        // if placeBlock === true -> go down until you hit another block or border
 
-        removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        currentBlockPosition[0] += 1;
+        if(placeBlock) handleBlockPlacement();
 
-        displayBlock(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        setGridArray(currentGrid);
-        setCurrentPosition(currentBlockPosition);
+        newBlockPosition[0] += 1;
+        let borderCollisionDetected = handleBorderCollision(newBlockPosition, currentBlockRotation, currentBlockType);
+
+        if(!borderCollisionDetected){
+
+            let blockCollisionDetected = handleBlockCollision(currentSolidBlock, newBlockPosition, currentBlockRotation, currentBlockType);
+            if(blockCollisionDetected) return;
+
+            removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
+            displayBlock(currentGrid, newBlockPosition, currentBlockRotation, currentBlockType);
+            setGridArray(currentGrid);
+            setCurrentPosition(newBlockPosition);
+        }
     }
 
     const moveBlockSideways = (moveAmount: number) => {
 
         let currentGrid = [...gridArrayRef.current];
+        let currentSolidBlock = [...solidBlocksRef.current];
         let currentBlockPosition = currentPositionRef.current;
+        let newBlockPosition = [...currentBlockPosition];
         let currentBlockRotation = currentBlockRotationRef.current;
         let currentBlockType = currentBlockTypeRef.current;
 
-        removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        currentBlockPosition[1] += moveAmount;
+        newBlockPosition[1] += moveAmount;
 
-        displayBlock(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        setGridArray(currentGrid);
-        setCurrentPosition(currentBlockPosition);
+        let borderCollisionDetected = handleBorderCollision(newBlockPosition, currentBlockRotation, currentBlockType);
+
+        if(!borderCollisionDetected){
+
+            let blockCollisionDetected = handleBlockCollision(currentSolidBlock, newBlockPosition, currentBlockRotation, currentBlockType);
+            if(blockCollisionDetected) return;
+
+            removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
+            displayBlock(currentGrid, newBlockPosition, currentBlockRotation, currentBlockType);
+            setGridArray(currentGrid);
+            setCurrentPosition(newBlockPosition);
+        }
     }
 
     const rotateBlock = (rotateAmount: number) => {
 
         let currentGrid = [...gridArrayRef.current];
+        let currentSolidBlock = [...solidBlocksRef.current];
         let currentBlockPosition = currentPositionRef.current;
         let currentBlockRotation = currentBlockRotationRef.current;
+        let newBlockRotation = currentBlockRotationRef.current;
         let currentBlockType = currentBlockTypeRef.current;
 
-        removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        currentBlockRotation += rotateAmount;
+        newBlockRotation += rotateAmount;
 
-        if(currentBlockRotation === 4){
-            currentBlockRotation = 0;
-        } else if(currentBlockRotation === -1){
-            currentBlockRotation = 3;
+        // create function move block by X so that it can rotate
+
+        let borderCollisionDetected = handleBorderCollision(currentBlockPosition, newBlockRotation, currentBlockType);
+       
+        if(!borderCollisionDetected){
+
+            let blockCollisionDetected = handleBlockCollision(currentSolidBlock, currentBlockPosition, currentBlockRotation, currentBlockType);
+            if(blockCollisionDetected) return;
+
+            removeLastBlockPosition(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
+
+            if(newBlockRotation === 4){
+                newBlockRotation = 0;
+            } else if(newBlockRotation === -1){
+                newBlockRotation = 3;
+            }
+
+            displayBlock(currentGrid, currentBlockPosition, newBlockRotation, currentBlockType);
+            setGridArray(currentGrid);
+            setCurrentBlockRotation(newBlockRotation);
         }
-
-        displayBlock(currentGrid, currentBlockPosition, currentBlockRotation, currentBlockType);
-        setGridArray(currentGrid);
-        setCurrentBlockRotation(currentBlockRotation);
     }
 
     const initializeGame = () => {
@@ -173,9 +196,9 @@ export function GameLogic(){
         placement = [17, -1];
         displayBlock(currentGrid, placement, 0, "Smashboy");
 
-        createBlock("Hero");
+        createBlock(currentBlockTypeRef.current);
 
-        setCurrentBlockType("Hero");
+        setCurrentBlockType(currentBlockTypeRef.current);
         setCurrentPosition([0, 3]);
         setLastPosition([]);
         setCurrentBlockRotation(0);
@@ -190,7 +213,7 @@ export function GameLogic(){
             setIntervalId(null);
         }
         
-        setIntervalId(setInterval(updateCurrentBlockPosition, 1000));
+        setIntervalId(setInterval(() => moveBlockDown(false), 1000));
     }
 
     const pauseGame = () => {
@@ -202,5 +225,5 @@ export function GameLogic(){
         }
     }
 
-    return {initializeGame, pauseGame, createBlock, updateCurrentBlockPosition, moveBlockSideways, rotateBlock, moveBlockDown};
+    return {initializeGame, pauseGame, createBlock, moveBlockSideways, rotateBlock, moveBlockDown};
 }

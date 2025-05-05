@@ -4,7 +4,7 @@ type GameSettings = {
     getGridWidth: number;
     getGridHeight: number;
     getGridArray: string[][];
-    getAllBlocks: string[][];
+    getSolidBlocks: number[][];
     getCurrentPosition: number[];
     getLastPosition: number[];
     getCurrentBlockType: string;
@@ -23,7 +23,7 @@ type GameSettings = {
     setGridWidth: (w: number) => void;
     setGridHeight: (w: number) => void;
     setGridArray: (w: string[][]) => void;
-    setAllBlocks: (w: string[][]) => void;
+    setSolidBlocks: (w: number[][]) => void;
     setCurrentPosition: (w: number[]) => void;
     setLastPosition: (w: number[]) => void;
     setCurrentBlockType: (w: string) => void;
@@ -48,12 +48,13 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const [getGridWidth, setGridWidth] = useState(10);
   const [getGridHeight, setGridHeight] = useState(20);
   const [getGridArray, setGridArray] = useState<string[][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill("")));
+  const [getSolidBlocks, setSolidBlocks] = useState<number[][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill(0)));
   const [getIntervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [getGameState, setGameState] = useState(false);
   // Current Block
   const [getCurrentPosition, setCurrentPosition] = useState<number[]>([0, 3]);
   const [getLastPosition, setLastPosition] = useState<number[]>([]); //bruch ich wahrschienlich nöd
-  const [getCurrentBlockType, setCurrentBlockType] = useState("Smashboy");
+  const [getCurrentBlockType, setCurrentBlockType] = useState("Hero");
   const [getCurrentBlockRotation, setCurrentBlockRotation] = useState(0);
   const [getLastBlockRotation, setLastBlockRotation] = useState(0); //bruch ich wahrschienlich nöd
   // Keyboard Setting
@@ -65,15 +66,13 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const [getRotateCounterClockwiseKey, setRotateCounterClockwiseKey] = useState("a");
   const [getStoreBlockKey, setStoreBlockKey] = useState("d");
   const [getPauseKey, setPauseKey] = useState("Escape");
-  // Grid Array
-  const [getAllBlocks, setAllBlocks] = useState<string[][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill("")));
 
   return (
     <GameContext.Provider value={{ 
-      getGridWidth, getGridHeight, getGridArray, getAllBlocks, getCurrentPosition, getLastPosition, getCurrentBlockType, getIntervalId,
+      getGridWidth, getGridHeight, getGridArray, getSolidBlocks, getCurrentPosition, getLastPosition, getCurrentBlockType, getIntervalId,
       getCurrentBlockRotation, getLastBlockRotation, getGameState,
       getMoveLeftKey, getMoveRightKey, getMoveDownKey, getPlaceBlockKey, getRotateClockwiseKey, getRotateCounterClockwiseKey, getStoreBlockKey, getPauseKey,
-      setGridWidth, setGridHeight, setGridArray, setAllBlocks, setCurrentPosition, setLastPosition, setCurrentBlockType, setIntervalId,
+      setGridWidth, setGridHeight, setGridArray, setSolidBlocks, setCurrentPosition, setLastPosition, setCurrentBlockType, setIntervalId,
       setCurrentBlockRotation, setLastBlockRotation, setGameState,
       setMoveLeftKey, setMoveRightKey, setMoveDownKey, setPlaceBlockKey, setRotateClockwiseKey, setRotateCounterClockwiseKey, setStoreBlockKey, setPauseKey,
     }}>
