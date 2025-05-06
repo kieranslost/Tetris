@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useGameSettings } from "../context/GameContext"
+import { BlockLogic } from "./BlockLogic";
 import { BlockRotations } from "./BlockRotations";
 
 export function GameLogic(){
@@ -27,7 +28,7 @@ export function GameLogic(){
         setGameState
     } = useGameSettings();
 
-    const { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock } = BlockRotations();
+    const { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock } = BlockLogic();
 
     const gridArrayRef = useRef(getGridArray);
     const solidBlocksRef = useRef(getSolidBlocks);
@@ -179,6 +180,7 @@ export function GameLogic(){
 
         let currentGrid = gridArrayRef.current;
 
+        /*
         let placement = [19, 0];
         displayBlock(currentGrid, placement, 0, "Hero");
         placement = [17, 2];
@@ -195,6 +197,7 @@ export function GameLogic(){
         displayBlock(currentGrid, placement, 2, "OrangeRicky");
         placement = [17, -1];
         displayBlock(currentGrid, placement, 0, "Smashboy");
+        */
 
         createBlock(currentBlockTypeRef.current);
 

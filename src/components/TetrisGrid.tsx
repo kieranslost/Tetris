@@ -1,8 +1,6 @@
 import { useGameSettings } from "../context/GameContext";
 import { TetrisGridBlock } from "./TetrisGridBlock";
 
-
-
 export function TetrisGrid(){
 
     const {
@@ -13,7 +11,7 @@ export function TetrisGrid(){
 
     return(
         <>
-            <table style={{backgroundColor: "#252422", borderRadius: "2px", margin: "10px auto", padding: "1px"}}>
+            <table style={{backgroundColor: "#252422", borderRadius: "3px", margin: "10px auto", padding: "1px"}}>
                 <tbody>
                     { Array.from({ length: getGridHeight }).map((_, rowIndex) => (
                         <tr key={rowIndex}>
