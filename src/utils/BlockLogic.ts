@@ -53,7 +53,7 @@ export function BlockLogic(){
 
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
-                if(solidBlock[placement[0]+i][placement[1]+block[i][n]] !== 0){
+                if(solidBlock[placement[0]+i][placement[1]+block[i][n]] === 1){
                     return true;
                 }
             }
@@ -84,5 +84,31 @@ export function BlockLogic(){
         }
     }
 
-    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock };
+    const getRandomBlock = () => {
+
+        let block = "";
+        let randomBlock = Math.floor(Math.random() * 6);
+
+        switch(randomBlock){
+            case 0: block = "Hero";
+                break;
+            case 1: block = "RhodeIslandZ";
+                break;
+            case 2: block = "ClevelandZ"
+                    break; 
+            case 3: block = "BlueRicky";
+                break;
+            case 4: block = "OrangeRicky"
+                break;
+            case 5: block ="Teewee";
+                break;
+            case 6: block = "Smashboy";
+                break;
+            default: console.error("Couldn't fetch block");
+        }
+
+        return block;
+    }
+
+    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock, getRandomBlock };
 }

@@ -1,7 +1,6 @@
 
 import { TetrisButton } from "../components/TetrisButton";
 import { TetrisGrid } from "../components/TetrisGrid";
-import { useGameSettings } from "../context/GameContext";
 import { GameLogic } from "../utils/GameLogic";
 
 export function GamePage () {

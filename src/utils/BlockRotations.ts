@@ -137,5 +137,31 @@ export function BlockRotations(){
         return block;
     }
 
-    return { getBlockSwitchCase };
+    const getRandomBlock = () => {
+
+        let block = "";
+        let randomBlock = Math.floor(Math.random() * 6);
+
+        switch(randomBlock){
+            case 0: block = "Hero";
+                break;
+            case 1: block = "RhodeIslandZ";
+                break;
+            case 2: block = "ClevelandZ"
+                    break; 
+            case 3: block = "BlueRicky";
+                break;
+            case 4: block = "OrangeRicky"
+                break;
+            case 5: block ="Teewee";
+                break;
+            case 6: block = "Smashboy";
+                break;
+            default: console.error("Couldn't fetch block");
+        }
+
+        return block;
+    }
+
+    return { getBlockSwitchCase, getRandomBlock };
 }

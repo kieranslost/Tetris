@@ -13,7 +13,6 @@ export function KeyboardListener() {
         getRotateCounterClockwiseKey,
         getStoreBlockKey,
         getPauseKey,
-        getGameState
     } = useGameSettings();
 
     const { pauseGame, moveBlockDown, moveBlockSideways, rotateBlock } = GameLogic();
