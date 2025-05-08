@@ -1,3 +1,5 @@
+import { SelectProvider } from "@mui/base";
+import { splitVendorChunk } from "vite";
 import { useGameSettings } from "../context/GameContext";
 import { BlockRotations } from "./BlockRotations";
 
@@ -8,6 +10,7 @@ export function BlockLogic(){
         getGridWidth,
         getNextBlockDisplayGridHeight,
         getNextBlockDisplayGridWidth,
+        setGridArray,
         setAllBlocks,
         setNextBlockDisplayGridArray
     } = useGameSettings();
@@ -143,10 +146,43 @@ export function BlockLogic(){
         return allDisplayedBlocks;
     }
 
+    const clearRows = (solidBlocks: number[][], displayBlock: string[][], allRemovedRows: number[]) => {
+        
+        for(let i = 0; i < allRemovedRows.length; i++ ){
+            solidBlocks.splice(allRemovedRows[i], 1);
+            displayBlock.splice(allRemovedRows[i], 1);
+        }
+
+        for(let i = 0; i < allRemovedRows.length; i++ ){
+            solidBlocks.unshift(Array(getGridWidth).fill(0));
+            displayBlock.unshift(Array(getGridWidth).fill(""));
+        }
+
+        setGridArray(displayBlock);
+    }
+
+    const checkIfRowNeedsToBeCleared = (solidBlocks: number[][], displayBlock: string[][], placedPosition: number[], blockName: string, rotationCycle: number) => {
+
+        let block = getBlockSwitchCase(blockName, rotationCycle);
+        let allRemovedRows: number[] = [];
+
+        for(let i = 0; i < block.length; i++){
+            if(placedPosition[0] < 0){
+                continue;
+            }
+
+            if(displayBlock[placedPosition[0] + i].every(cell => cell !== "")){
+                allRemovedRows.push(placedPosition[0] + i);
+            }
+        }
+        
+        clearRows(solidBlocks, displayBlock, allRemovedRows);
+    }
+
     const getRandomBlock = () => {
 
         let block = "";
-        let randomBlock = Math.floor(Math.random() * 6);
+        let randomBlock = Math.floor(Math.random() * 7);
 
         switch(randomBlock){
             case 0: block = "Hero";
@@ -169,5 +205,5 @@ export function BlockLogic(){
         return block;
     }
 
-    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, handleBlockCollisionOnBlockCreation, solidifyBlock, getRandomBlock, displayNextBlock };
+    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, handleBlockCollisionOnBlockCreation, solidifyBlock, displayNextBlock, checkIfRowNeedsToBeCleared };
 }

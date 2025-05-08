@@ -7,7 +7,7 @@ import { GameLogic } from "../utils/GameLogic";
 
 export function GamePage () {
 
-    const { initializeGame, pauseGame, createBlock, moveBlockDown } = GameLogic();
+    const { initializeGame, pauseGame } = GameLogic();
 
     const handleStartGame = () => {
 
@@ -23,8 +23,6 @@ export function GamePage () {
         <>
             <TetrisButton tabIndex={-1} onClick={handleStartGame}>Start Button</TetrisButton>
             <TetrisButton tabIndex={-1} onClick={handlePauseGame}>Stop Button</TetrisButton>
-
-            <TetrisButton onClick={() => moveBlockDown(false)}>Update Current Block</TetrisButton>
            
             <TetrisCard></TetrisCard>
         </>

@@ -34,7 +34,7 @@ export function GameLogic(){
         setAllBlocks,
     } = useGameSettings();
 
-    const { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, handleBlockCollisionOnBlockCreation, solidifyBlock, getRandomBlock, displayNextBlock } = BlockLogic();
+    const { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, handleBlockCollisionOnBlockCreation, solidifyBlock, displayNextBlock, checkIfRowNeedsToBeCleared } = BlockLogic();
 
     const gridArrayRef = useRef(getGridArray);
     const solidBlocksRef = useRef(getSolidBlocks);
@@ -105,6 +105,7 @@ export function GameLogic(){
         let currentBlockType = currentBlockTypeRef.current;
 
         solidifyBlock(currentSolidBlock, placedBlockPosition, currentBlockRotation, currentBlockType);
+        checkIfRowNeedsToBeCleared(solidBlocksRef.current, gridArrayRef.current, placedBlockPosition, currentBlockType, currentBlockRotation);
         createBlock(allBlocksRef.current);
     }
 
