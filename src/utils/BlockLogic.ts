@@ -6,6 +6,10 @@ export function BlockLogic(){
     const {
         getGridHeight,
         getGridWidth,
+        getNextBlockDisplayGridHeight,
+        getNextBlockDisplayGridWidth,
+        setAllBlocks,
+        setNextBlockDisplayGridArray
     } = useGameSettings();
 
     const { getBlockSwitchCase } = BlockRotations();
@@ -16,6 +20,10 @@ export function BlockLogic(){
 
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
+                if(lastPlacement[0]+i < 0){
+                    continue;
+                }
+
                 solidBlock[lastPlacement[0]+i][lastPlacement[1]+block[i][n]] = 1;
             }
         }   
@@ -53,11 +61,25 @@ export function BlockLogic(){
 
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
+                if(placement[0]+i < 0){
+                    continue;
+                }
+
                 if(solidBlock[placement[0]+i][placement[1]+block[i][n]] === 1){
                     return true;
                 }
             }
         }    
+
+        return false;
+    }
+
+    const handleBlockCollisionOnBlockCreation = (solidBlock: number[][], placement: number[], rotationCycle: number, blockName: string) => {
+
+        if(handleBlockCollision(solidBlock, placement, rotationCycle, blockName)){
+            placement[0] -= 1;
+            return handleBlockCollision(solidBlock, placement, rotationCycle, blockName);
+        }
 
         return false;
     }
@@ -68,9 +90,13 @@ export function BlockLogic(){
         
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
+                if(placement[0]+i < 0){
+                    continue;
+                }
+                
                 currentGrid[placement[0]+i][placement[1]+block[i][n]] = blockName;
             }
-        }    
+        }
     }
 
     const removeLastBlockPosition = (currentGrid: string[][], lastPlacement: number[], lastRotationCycle: number, blockName: string) => {
@@ -79,9 +105,42 @@ export function BlockLogic(){
 
         for(let i = 0; i < block.length; i++){
             for(let n = 0; n < block[i].length; n++){
+                if(lastPlacement[0]+i < 0){
+                    continue;
+                }
+                
                 currentGrid[lastPlacement[0]+i][lastPlacement[1]+block[i][n]] = "";
             }
         }
+    }
+
+    const createNextBlockDisplayGrid = (allDisplayedBlocks: string[]) => {
+
+        let displayGird: string[][] = Array(getNextBlockDisplayGridHeight).fill(null).map(() => Array(getNextBlockDisplayGridWidth).fill(""));
+
+        displayBlock(displayGird, [1, 1], 0, allDisplayedBlocks[0]);
+        displayBlock(displayGird, [4, 1], 0, allDisplayedBlocks[1]);
+        displayBlock(displayGird, [7, 1], 0, allDisplayedBlocks[2]);
+
+        return displayGird;
+    }
+
+    const displayNextBlock = (allDisplayedBlocks: string[], onGameStart: boolean) => {
+
+        if(onGameStart){
+            let allBlocks = [];
+
+            for(let i = 0; i < 3 ; i++){
+                allBlocks.push(getRandomBlock());
+            }
+
+            setAllBlocks(allBlocks);
+            return allBlocks;
+        }
+        
+        allDisplayedBlocks.push(getRandomBlock());
+        setNextBlockDisplayGridArray(createNextBlockDisplayGrid(allDisplayedBlocks));
+        return allDisplayedBlocks;
     }
 
     const getRandomBlock = () => {
@@ -110,5 +169,5 @@ export function BlockLogic(){
         return block;
     }
 
-    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, solidifyBlock, getRandomBlock };
+    return { displayBlock, removeLastBlockPosition, handleBorderCollision, handleBlockCollision, handleBlockCollisionOnBlockCreation, solidifyBlock, getRandomBlock, displayNextBlock };
 }
